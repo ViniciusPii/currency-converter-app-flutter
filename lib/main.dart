@@ -29,8 +29,18 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  var _dolar;
-  var _euro;
+  final realController = TextEditingController();
+  final dolarController = TextEditingController();
+  final euroController = TextEditingController();
+
+  double dolar;
+  double euro;
+
+  void _realChange(String text) {}
+
+  void _dolarChange(String text) {}
+
+  void _euroChange(String text) {}
 
   @override
   Widget build(BuildContext context) {
@@ -69,8 +79,8 @@ class _HomeState extends State<Home> {
                   ),
                 );
               } else {
-                _dolar = snap.data["results"]["currencies"]["USD"]["buy"];
-                _euro = snap.data["results"]["currencies"]["EUR"]["buy"];
+                dolar = snap.data["results"]["currencies"]["USD"]["buy"];
+                euro = snap.data["results"]["currencies"]["EUR"]["buy"];
                 return SingleChildScrollView(
                   padding: EdgeInsets.symmetric(horizontal: 15),
                   child: Column(
@@ -84,54 +94,12 @@ class _HomeState extends State<Home> {
                           color: Colors.green,
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 30),
-                        child: TextField(
-                          decoration: InputDecoration(
-                            labelText: "Reais",
-                            labelStyle: TextStyle(color: Colors.green),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.green,
-                              ),
-                            ),
-                            prefix: Text("R\$ "),
-                          ),
-                          style: TextStyle(color: Colors.black54, fontSize: 20),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 15),
-                        child: TextField(
-                          decoration: InputDecoration(
-                            labelText: "Dólares",
-                            labelStyle: TextStyle(color: Colors.green),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.green,
-                              ),
-                            ),
-                            prefix: Text("US\$ "),
-                          ),
-                          style: TextStyle(color: Colors.black54, fontSize: 20),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 15),
-                        child: TextField(
-                          decoration: InputDecoration(
-                            labelText: "Euros",
-                            labelStyle: TextStyle(color: Colors.green),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.green,
-                              ),
-                            ),
-                            prefix: Text("€ "),
-                          ),
-                          style: TextStyle(color: Colors.black54, fontSize: 20),
-                        ),
-                      ),
+                      buildTextField(
+                          "Reais", "R\$ ", realController, _realChange),
+                      buildTextField(
+                          "Dólares", "US\$ ", dolarController, _dolarChange),
+                      buildTextField(
+                          "Euros", "€ ", euroController, _euroChange),
                     ],
                   ),
                 );
@@ -141,6 +109,29 @@ class _HomeState extends State<Home> {
       ),
     );
   }
+}
+
+Widget buildTextField(String label, String prefix,
+    TextEditingController controller, Function function) {
+  return Padding(
+    padding: EdgeInsets.only(top: 15),
+    child: TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.green),
+        border: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.green,
+          ),
+        ),
+        prefix: Text(prefix),
+      ),
+      style: TextStyle(color: Colors.black54, fontSize: 20),
+      onChanged: function,
+      keyboardType: TextInputType.number,
+    ),
+  );
 }
 
 Future<Map> getData() async {
