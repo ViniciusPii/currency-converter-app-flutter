@@ -14,11 +14,11 @@ void main() async {
       theme: ThemeData(
           primaryColor: Colors.green,
           inputDecorationTheme: InputDecorationTheme(
-            enabledBorder:
-                OutlineInputBorder(borderSide: BorderSide(color: Colors.green)),
-            focusedBorder:
-                OutlineInputBorder(borderSide: BorderSide(color: Colors.green)),
-          )),
+              enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.green)),
+              focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.green)),
+              hintStyle: TextStyle(color: Colors.green))),
     ),
   );
 }
@@ -29,18 +29,36 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final realController = TextEditingController();
-  final dolarController = TextEditingController();
-  final euroController = TextEditingController();
-
-  double dolar;
+  double dollar;
   double euro;
 
-  void _realChange(String text) {}
+  final realController = TextEditingController();
+  final dollarController = TextEditingController();
+  final euroController = TextEditingController();
 
-  void _dolarChange(String text) {}
+  void _realChange(String text) {
+    double real = double.parse(text.replaceAll(',', '.'));
+    dollarController.text = (real / dollar).toStringAsFixed(2);
+    euroController.text = (real / euro).toStringAsFixed(2);
+  }
 
-  void _euroChange(String text) {}
+  void _dollarChange(String text) {
+    double dollar = double.parse(text.replaceAll(',', '.'));
+    realController.text = (dollar * this.dollar).toStringAsFixed(2);
+    euroController.text = (dollar * this.dollar / euro).toStringAsFixed(2);
+  }
+
+  void _euroChange(String text) {
+    double euro = double.parse(text.replaceAll(',', '.'));
+    realController.text = (euro * this.euro).toStringAsFixed(2);
+    realController.text = (euro * this.euro / dollar).toStringAsFixed(2);
+  }
+
+  void _resetFields() {
+    realController.text = "";
+    dollarController.text = "";
+    euroController.text = "";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +67,9 @@ class _HomeState extends State<Home> {
         backgroundColor: Colors.green,
         title: Text("Conversor de Moedas"),
         centerTitle: true,
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.refresh), onPressed: _resetFields)
+        ],
       ),
       body: FutureBuilder<Map>(
         future: getData(),
@@ -79,7 +100,7 @@ class _HomeState extends State<Home> {
                   ),
                 );
               } else {
-                dolar = snap.data["results"]["currencies"]["USD"]["buy"];
+                dollar = snap.data["results"]["currencies"]["USD"]["buy"];
                 euro = snap.data["results"]["currencies"]["EUR"]["buy"];
                 return SingleChildScrollView(
                   padding: EdgeInsets.symmetric(horizontal: 15),
@@ -97,7 +118,7 @@ class _HomeState extends State<Home> {
                       buildTextField(
                           "Reais", "R\$ ", realController, _realChange),
                       buildTextField(
-                          "Dólares", "US\$ ", dolarController, _dolarChange),
+                          "Dólares", "US\$ ", dollarController, _dollarChange),
                       buildTextField(
                           "Euros", "€ ", euroController, _euroChange),
                     ],
@@ -129,7 +150,7 @@ Widget buildTextField(String label, String prefix,
       ),
       style: TextStyle(color: Colors.black54, fontSize: 20),
       onChanged: function,
-      keyboardType: TextInputType.number,
+      keyboardType: TextInputType.numberWithOptions(decimal: true),
     ),
   );
 }
